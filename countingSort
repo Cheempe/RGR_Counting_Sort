@@ -1,0 +1,48 @@
+fun countingSortFromEnd(arr: IntArray, maxValue: Int) {
+    val counts = IntArray(maxValue + 1) // Створюємо масив для підрахунку кількості кожного числа
+    val output = IntArray(arr.size) // Створюємо вихідний масив для впорядкування чисел
+
+    // Зберігаємо кількість кожного елемента в масиві
+    for (num in arr) {
+        counts[num]++
+    }
+
+    // Виводимо початковий масив
+    println("Початковий масив: ${arr.joinToString()}")
+
+    // Масив для зберігання кількості кожного числа
+    println("\nМасив кількості кожного числа:")
+    println(counts.joinToString())
+
+    // Модифікуємо масив counts для зберігання суми попередніх кількостей
+    val cumulativeCounts = IntArray(counts.size)
+    cumulativeCounts[0] = counts[0]
+    for (i in 1 until counts.size) {
+        cumulativeCounts[i] = cumulativeCounts[i - 1] + counts[i]
+    }
+
+    // Зберігаємо масив cumulativeCounts аналогічно вихідному та масиву кількостей
+    println("\nМасив для накопичених сум:")
+    println(cumulativeCounts.joinToString())
+
+    // Створюємо відсортований масив ітеративно з кінця
+    for (i in arr.size - 1 downTo 0) {
+        val num = arr[i]
+        output[cumulativeCounts[num] - 1] = num
+        cumulativeCounts[num]--
+        println("Ітерація ${arr.size - i}: ${output.joinToString()}")
+    }
+
+    // Копіюємо відсортований масив у вихідний масив
+    output.copyInto(arr)
+
+    // Виводимо відсортований масив
+    println("\nВідсортований масив: ${arr.joinToString()}")
+}
+
+fun main() {
+    val arr = intArrayOf(4, 2, 2, 8, 3, 3, 1)
+    val maxValue = arr.maxOrNull() ?: 0 // Знаходимо максимальне значення у масиві
+
+    countingSortFromEnd(arr, maxValue)
+}
