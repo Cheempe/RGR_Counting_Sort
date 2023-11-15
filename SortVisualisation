@@ -1,0 +1,167 @@
+import javax.swing.*;
+import java.awt.*;
+import java.util.Arrays;
+import java.util.Random;
+
+public class SortingVisualizer extends JPanel {
+    private int[] originalArray;
+    private int[] countingSortArray;
+    private int[] bubbleSortArray;
+
+    public SortingVisualizer(int[] array) {
+        this.originalArray = array.clone();
+        this.countingSortArray = array.clone();
+        this.bubbleSortArray = array.clone();
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+
+        int width = getWidth();
+        int height = getHeight();
+        int barWidth = width / countingSortArray.length;
+        int halfHeight = height / 2;
+
+        // Display original array and sorted arrays in the upper left corner as rows
+        int yOffset = 20;
+        g.setColor(Color.BLACK);
+        g.drawString("Counting Sort", 50, yOffset);
+
+        yOffset = getHeight() / 2 + 20;
+        g.drawString("Bubble Sort", 50, yOffset);
+
+
+        // Display Counting Sort result in the top half
+        for (int i = 0; i < countingSortArray.length; i++) {
+            int x = i * barWidth;
+            int barHeight = countingSortArray[i] * (halfHeight-30) / Arrays.stream(countingSortArray).max().getAsInt();
+            g.setColor(Color.BLUE);
+            g.fillRect(x, halfHeight - barHeight, barWidth, barHeight);
+            g.setColor(Color.BLACK);
+            g.drawRect(x, halfHeight - barHeight, barWidth, barHeight);
+            String value = Integer.toString(countingSortArray[i]);
+            g.setColor(Color.BLACK);
+            g.drawString(value, x + barWidth / 2 - 10, halfHeight - barHeight - 5);
+        }
+
+        // Display Bubble Sort result in the bottom half
+        for (int i = 0; i < bubbleSortArray.length; i++) {
+            int x = i * barWidth;
+            int barHeight = bubbleSortArray[i] * (halfHeight-30) / Arrays.stream(bubbleSortArray).max().getAsInt();
+            g.setColor(Color.RED);
+            g.fillRect(x, height - barHeight, barWidth, barHeight);
+            g.setColor(Color.BLACK);
+            g.drawRect(x, height - barHeight, barWidth, barHeight);
+            String value = Integer.toString(bubbleSortArray[i]);
+            g.setColor(Color.BLACK);
+            g.drawString(value, x + barWidth / 2 - 10, height - barHeight - 5);
+        }
+    }
+
+    public void visualizeSorting() {
+        int max = 99; // Restrict to values from 0 to 99
+        int n = countingSortArray.length;
+
+        for (int i = 0; i < n; i++) {
+            if (countingSortArray[i] < 0 || countingSortArray[i] > max) {
+                JOptionPane.showMessageDialog(null, "Invalid array element. Please enter values between 0 and 99.");
+                System.exit(0);
+            }
+        }
+
+        // Create and start a thread for each sorting algorithm
+        Thread countingSortThread = new Thread(() -> countingSort(countingSortArray));
+        Thread bubbleSortThread = new Thread(() -> bubbleSort(bubbleSortArray));
+
+        countingSortThread.start();
+        bubbleSortThread.start();
+    }
+
+    // Counting Sort
+    public void countingSort(int[] array) {
+        int max = 99; // Restrict to values from 0 to 99
+        int n = array.length;
+
+        int[] countArray = new int[max + 1];
+        int outputIndex = 0;
+
+        // Count the occurrences of each element
+        for (int num : array) {
+            countArray[num]++;
+        }
+
+        for (int i = 0; i <= max; i++) {
+            while (countArray[i] > 0) {
+                array[outputIndex] = i;
+                outputIndex++;
+                countArray[i]--;
+
+                repaint(); // Repaint the panel to show the updated array
+
+                try {
+                    Thread.sleep(200); // Delay to slow down the visualization
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    // Bubble Sort
+    public void bubbleSort(int[] array) {
+        int n = array.length;
+        for (int i = 0; i < n - 1; i++) {
+            for (int j = 0; j < n - i - 1; j++) {
+                if (array[j] > array[j + 1]) {
+                    int temp = array[j];
+                    array[j] = array[j + 1];
+                    array[j + 1] = temp;
+
+                    repaint(); // Repaint the panel to show the updated array
+
+                    try {
+                        Thread.sleep(200); // Delay to slow down the visualization
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        int size = Integer.parseInt(JOptionPane.showInputDialog("Enter the array size (up to 30):"));
+        if (size > 30 || size <= 0) {
+            JOptionPane.showMessageDialog(null, "Invalid array size. Please enter a size between 1 and 30.");
+            System.exit(0);
+        }
+
+        int[] array = new int[size];
+
+        int option = JOptionPane.showConfirmDialog(null, "Generate a random array?", "Random Array", JOptionPane.YES_NO_OPTION);
+        if (option == JOptionPane.YES_OPTION) {
+            Random random = new Random();
+            for (int i = 0; i < size; i++) {
+                array[i] = random.nextInt(100); // Random values between 0 and 99
+            }
+        } else {
+            for (int i = 0; i < size; i++) {
+                array[i] = Integer.parseInt(JOptionPane.showInputDialog("Enter element " + (i + 1) + ":"));
+                if (array[i] < 0 || array[i] > 99) { // Check the range
+                    JOptionPane.showMessageDialog(null, "Invalid array element. Please enter values between 0 and 99.");
+                    System.exit(0);
+                }
+            }
+        }
+
+        SortingVisualizer visualizer = new SortingVisualizer(array);
+        JFrame frame = new JFrame("Sorting Visualizer");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.add(visualizer);
+        frame.setSize(900, 600);
+        frame.setVisible(true);
+
+        visualizer.visualizeSorting();
+    }
+}
