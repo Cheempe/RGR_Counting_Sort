@@ -70,13 +70,26 @@ public class SortingVisualizer extends JPanel {
             }
         }
 
-        // Create and start a thread for each sorting algorithm
-        Thread countingSortThread = new Thread(() -> countingSort(countingSortArray));
-        Thread bubbleSortThread = new Thread(() -> bubbleSort(bubbleSortArray));
+        // Create a runnable to start sorting after a delay
+        Runnable startSorting = () -> {
+            try {
+                Thread.sleep(3000); // Delay of 3 seconds
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
 
-        countingSortThread.start();
-        bubbleSortThread.start();
+            // Create and start a thread for each sorting algorithm after the delay
+            Thread countingSortThread = new Thread(() -> countingSort(countingSortArray));
+            Thread bubbleSortThread = new Thread(() -> bubbleSort(bubbleSortArray));
+
+            countingSortThread.start();
+            bubbleSortThread.start();
+        };
+
+
+        new Thread(startSorting).start();
     }
+
 
     // Counting Sort
     public void countingSort(int[] array) {
