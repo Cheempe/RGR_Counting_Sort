@@ -1,4 +1,4 @@
-import kotlin.system.measureTimeMillis
+import kotlin.system.measureNanoTime
 import kotlin.random.Random
 
 fun countingSort(arr: IntArray) {
@@ -11,7 +11,7 @@ fun countingSort(arr: IntArray) {
     }
 
     var index = 0
-    for (i in 0 until count.size) {
+    for (i in count.indices) {
         while (count[i] > 0) {
             output[index] = i
             index++
@@ -42,9 +42,13 @@ fun generateRandomArray(size: Int, maxVal: Int): IntArray {
 }
 
 fun main() {
+    println("Enter the maximum value (maxVal): ")
+    val maxVal = readLine()?.toIntOrNull() ?: 1000
+
+    println("Enter the array size: ")
+    val arraySize = readLine()?.toIntOrNull() ?: 1000
+
     val numArrays = 100
-    val arraySize = 10000
-    val maxVal = 1000000 // Adjust the maximum value based on your requirements
 
     var countingSortTimeSum = 0L
     var bubbleSortTimeSum = 0L
@@ -52,12 +56,12 @@ fun main() {
     for (i in 1..numArrays) {
         val arr = generateRandomArray(arraySize, maxVal)
 
-        val countingSortTime = measureTimeMillis {
+        val countingSortTime = measureNanoTime {
             countingSort(arr)
         }
         countingSortTimeSum += countingSortTime
 
-        val bubbleSortTime = measureTimeMillis {
+        val bubbleSortTime = measureNanoTime {
             bubbleSort(arr.clone())
         }
         bubbleSortTimeSum += bubbleSortTime
@@ -66,6 +70,6 @@ fun main() {
     val avgCountingSortTime = countingSortTimeSum / numArrays
     val avgBubbleSortTime = bubbleSortTimeSum / numArrays
 
-    println("Average Counting Sort Time: $avgCountingSortTime ms")
-    println("Average Bubble Sort Time: $avgBubbleSortTime ms")
+    println("Average Counting Sort Time: $avgCountingSortTime ns")
+    println("Average Bubble Sort Time: $avgBubbleSortTime ns")
 }
