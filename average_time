@@ -52,14 +52,18 @@ fun main() {
 
     var countingSortTimeSum = 0L
     var bubbleSortTimeSum = 0L
+    var countingSortMemorySum = 0L
 
     for (i in 1..numArrays) {
         val arr = generateRandomArray(arraySize, maxVal)
 
+        val countingSortBeforeMem = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()
         val countingSortTime = measureNanoTime {
             countingSort(arr)
         }
+        val countingSortAfterMem = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()
         countingSortTimeSum += countingSortTime
+        countingSortMemorySum += countingSortAfterMem - countingSortBeforeMem
 
         val bubbleSortTime = measureNanoTime {
             bubbleSort(arr.clone())
@@ -69,7 +73,10 @@ fun main() {
 
     val avgCountingSortTime = countingSortTimeSum / numArrays
     val avgBubbleSortTime = bubbleSortTimeSum / numArrays
+    val avgCountingSortMemory = countingSortMemorySum / numArrays
 
     println("Average Counting Sort Time: $avgCountingSortTime ns")
     println("Average Bubble Sort Time: $avgBubbleSortTime ns")
+    println("Average Counting Sort Memory: $avgCountingSortMemory bytes")
 }
+
